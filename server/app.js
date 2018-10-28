@@ -42,5 +42,38 @@ app.use(function(err, req, res, next) {
 	res.render('error');
 });
 
-// HTTP server
-http.createServer(app).listen(8080);
+const http_port = process.env.HTTP_PORT | 3000;
+const http_server = http.createServer(app);
+
+console.log('starting server on port ', http_port);
+http_server.listen(http_port);
+
+http_server.on('error', onError);
+// http_server.on('listening', onListening);
+
+function onError(error) {
+	if (error.syscall !== 'listen') {
+		throw error;
+	}
+	let bind = typeof port === 'string' ? 'Pipe ' + port : 'Port ' + port;
+
+	// handle specific listen errors with friendly messages
+	switch (error.code) {
+		case 'EACCES':
+			console.error(bind + ' requires elevated privileges');
+			process.exit(1);
+			break;
+		case 'EADDRINUSE':
+			console.error(bind + ' is already in use');
+			process.exit(1);
+			break;
+		default:
+			throw error;
+	}
+}
+
+function onListening() {
+	let addr = this.address();
+	let bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
+	debug('Listening on ' + bind);
+}
